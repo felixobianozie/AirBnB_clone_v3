@@ -62,7 +62,11 @@ class FileStorage:
                 tmp_dict = json.load(file)
                 for key, value in tmp_dict.items():
                     self.__objects[key] = eval(key.split(".")[0])(**value)
-                    
+
+    def close(self):
+        """Closes the storage engine."""
+        self.reload()
+        
     def get(self, cls, id):
         """
         Returns the object based on the class name and its ID, or
