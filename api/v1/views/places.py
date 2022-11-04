@@ -8,12 +8,12 @@ from models.amenity import Amenity
 from models import storage
 from api.v1.views import app_views
 from flask import abort, jsonify, make_response, request
-from flasgger.utils import swag_from
+#from flasgger.utils import swag_from
 
 
 @app_views.route('/cities/<city_id>/places', methods=['GET'],
                  strict_slashes=False)
-@swag_from('documentation/place/get_places.yml', methods=['GET'])
+#@swag_from('documentation/place/get_places.yml', methods=['GET'])
 def get_places(city_id):
     """
     Retrieves the list of all Place objects of a City
@@ -29,7 +29,7 @@ def get_places(city_id):
 
 
 @app_views.route('/places/<place_id>', methods=['GET'], strict_slashes=False)
-@swag_from('documentation/place/get_place.yml', methods=['GET'])
+#@swag_from('documentation/place/get_place.yml', methods=['GET'])
 def get_place(place_id):
     """
     Retrieves a Place object
@@ -43,7 +43,7 @@ def get_place(place_id):
 
 @app_views.route('/places/<place_id>', methods=['DELETE'],
                  strict_slashes=False)
-@swag_from('documentation/place/delete_place.yml', methods=['DELETE'])
+#@swag_from('documentation/place/delete_place.yml', methods=['DELETE'])
 def delete_place(place_id):
     """
     Deletes a Place Object
@@ -62,7 +62,7 @@ def delete_place(place_id):
 
 @app_views.route('/cities/<city_id>/places', methods=['POST'],
                  strict_slashes=False)
-@swag_from('documentation/place/post_place.yml', methods=['POST'])
+#@swag_from('documentation/place/post_place.yml', methods=['POST'])
 def post_place(city_id):
     """
     Creates a Place
@@ -70,7 +70,7 @@ def post_place(city_id):
     city = storage.get(City, city_id)
 
     if not city:
-        abort(404)
+        abort(404, description="Wrong city detail")
 
     if not request.get_json():
         abort(400, description="Not a JSON")
@@ -82,19 +82,24 @@ def post_place(city_id):
     user = storage.get(User, data['user_id'])
 
     if not user:
-        abort(404)
+        abort(404, description="Wrong user detail")
 
     if 'name' not in request.get_json():
         abort(400, description="Missing name")
 
-    data["city_id"] = city_id
-    instance = Place(**data)
+    instance = Place()
+    instance.city_id = city_id
+    ignore = ['id', 'created_at', 'city_id', 'updated_at']
+
+    for key, value in data.items():
+        if key not in ignore:
+            setattr(instance, key, value)
     instance.save()
     return make_response(jsonify(instance.to_dict()), 201)
 
 
 @app_views.route('/places/<place_id>', methods=['PUT'], strict_slashes=False)
-@swag_from('documentation/place/put_place.yml', methods=['PUT'])
+#@swag_from('documentation/place/put_place.yml', methods=['PUT'])
 def put_place(place_id):
     """
     Updates a Place
@@ -117,14 +122,14 @@ def put_place(place_id):
     return make_response(jsonify(place.to_dict()), 200)
 
 
+"""
 @app_views.route('/places_search', methods=['POST'], strict_slashes=False)
-@swag_from('documentation/place/post_search.yml', methods=['POST'])
+#@swag_from('documentation/place/post_search.yml', methods=['POST'])
 def places_search():
-    """
+    ""
     Retrieves all Place objects depending of the JSON in the body
     of the request
-    """
-
+    ""
     if request.get_json() is None:
         abort(400, description="Not a JSON")
 
@@ -177,4 +182,4 @@ def places_search():
         d.pop('amenities', None)
         places.append(d)
 
-    return jsonify(places)
+    return jsonify(places)"""

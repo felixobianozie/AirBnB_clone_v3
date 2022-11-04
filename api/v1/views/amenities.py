@@ -64,7 +64,12 @@ def post_amenity():
         abort(400, description="Missing name")
 
     data = request.get_json()
-    instance = Amenity(**data)
+    instance = Amenity()
+    ignore = ['id', 'created_at', 'updated_at']
+
+    for key, value in data.items():
+        if key not in ignore:
+            setattr(instance, key, value)
     instance.save()
     return make_response(jsonify(instance.to_dict()), 201)
 
